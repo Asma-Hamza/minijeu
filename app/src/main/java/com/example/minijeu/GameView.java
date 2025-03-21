@@ -2,14 +2,13 @@ package com.example.minijeu;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import com.example.minijeu.entities.GameCharacters;
 
 import java.util.Iterator;
 
@@ -86,14 +85,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(Color.GREEN);
         canvas.drawRect(0, getHeight() - 100, getWidth(), getHeight(), paint);
 
-        paint.setColor(Color.RED);
-        canvas.drawRect(characterX, characterY, characterX + characterWidth, characterY + characterHeight, paint);
+        Bitmap spriteSheetPrincess = BitmapFactory.decodeResource(getResources(), R.drawable.princess);
+        Bitmap princess = Bitmap.createScaledBitmap(spriteSheetPrincess, spriteSheetPrincess.getWidth() * 3, spriteSheetPrincess.getHeight() * 3,false);
+        canvas.drawBitmap(princess, characterX, characterY - characterHeight + 10, null);
 
-        paint.setColor(Color.BLACK);
+        Bitmap spriteSheet = BitmapFactory.decodeResource(getResources(), R.drawable.axe_sprite);
+        Bitmap axe = Bitmap.createScaledBitmap(spriteSheet, spriteSheet.getWidth() * 3, spriteSheet.getHeight() * 3,false);
+
         for (Obstacle obstacle : obstacles) {
-            //canvas.drawRect(obstacle.x, groundY - obstacle.size, obstacle.x + obstacle.size, groundY, paint);
-            //canvas.drawBitmap(GameCharacters.GHOST.getSprite(0,0), 200, 200, null);
-            canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
+            //canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
+            canvas.drawBitmap(axe, obstacle.x, groundY - obstacle.size, null);
+
         }
 
         if (gameOver) {
