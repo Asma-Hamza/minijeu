@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -28,8 +30,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private int characterX = 0;
     private int characterY = 0;
     private ArrayList<Obstacle> obstacles = new ArrayList<>();
+    private ArrayList<Cloud> clouds = new ArrayList<>();
+    private int cloudSpeed = 2;
+    private Bitmap cloudBitmap;
     private int obstacleSpeed = 10;
-    private static final int MIN_DISTANCE_BETWEEN_OBSTACLES = 200;
+    private static final int MIN_DISTANCE_BETWEEN_OBSTACLES = 500;
 
 
     public GameView(Context context) {
@@ -66,6 +71,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         groundY = getHeight() - 100;
         characterY = groundY - characterHeight;
 
+        Bitmap decodeCloud = BitmapFactory.decodeResource(getResources(), R.drawable.cloud);
+        cloudBitmap = Bitmap.createScaledBitmap(decodeCloud, decodeCloud.getWidth(), decodeCloud.getHeight(), false);
+
+        for (int i = 0; i < 3; i++) {
+            int x = getWidth() + i * 300;
+            int y = (int) (Math.random() * 150 + 50);
+            clouds.add(new Cloud(x, y, cloudBitmap));
+        }
+
         thread.setRunning(true);
         thread.start();
     }
@@ -79,8 +93,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         Paint paint = new Paint();
 
-        paint.setColor(Color.CYAN);
-        canvas.drawRect(0, 0, getWidth(), getHeight() - 100, paint);
+        Paint skyPaint = new Paint();
+        LinearGradient gradient = new LinearGradient(
+                0, 0, 0, getHeight(),
+                new int[]{Color.rgb(135, 206, 250), Color.rgb(70, 130, 180), Color.rgb(25, 25, 112)},
+                new float[]{0f, 0.5f, 1f},
+                Shader.TileMode.CLAMP
+        );
+        skyPaint.setShader(gradient);
+        canvas.drawRect(0, 0, getWidth(), getHeight() - 100, skyPaint);
+
+        for (Cloud cloud : clouds) {
+            canvas.drawBitmap(cloud.image, cloud.x, cloud.y, null);
+        }
 
         paint.setColor(Color.GREEN);
         canvas.drawRect(0, getHeight() - 100, getWidth(), getHeight(), paint);
@@ -95,8 +120,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         for (Obstacle obstacle : obstacles) {
             //canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
             canvas.drawBitmap(axe, obstacle.x, groundY - obstacle.size, null);
-
         }
+
 
         if (gameOver) {
             Paint textPaint = new Paint();
@@ -137,6 +162,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 //obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
                 generateObstacle();
             }
+
+            Iterator<Cloud> cloudIterator = clouds.iterator();
+            while (cloudIterator.hasNext()) {
+                Cloud cloud = cloudIterator.next();
+                cloud.x -= cloudSpeed;
+
+                if (cloud.x < -cloud.image.getWidth()) {
+                    cloudIterator.remove();
+                    int newX = getWidth() + (int) (Math.random() * 200 + 150); // More spaced out
+                    int newY = (int) (Math.random() * 150 + 50);
+                    clouds.add(new Cloud(newX, newY, cloudBitmap));
+                }
+            }
         }
     }
 
@@ -168,6 +206,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (lastObstacle.x < getWidth() - MIN_DISTANCE_BETWEEN_OBSTACLES) {
                 obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
             }
+        }
+    }
+
+    private static class Cloud {
+        int x, y;
+        Bitmap image;
+
+        Cloud(int x, int y, Bitmap image) {
+            this.x = x;
+            this.y = y;
+            this.image = image;
         }
     }
 }
