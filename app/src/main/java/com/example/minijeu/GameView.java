@@ -14,18 +14,16 @@ import java.util.ArrayList;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private final GameThread thread;
-    private int x = 0;
-    private int x2 = 300;
     private boolean gameOver = false;
-    private Context context;
     private boolean isJumping = false;
     private float jumpVelocity = 0;
     private float gravity = 2;
-    private int groundY;
+    private int groundY = 400;
     private int jumpHeight = 150;
-    private int characterY;
-    private final int characterX = 150;
-    private final int characterSize = 50;
+    private int characterWidth = 50;
+    private int characterHeight = 100;
+    private int characterX = 0;
+    private int characterY = 0;
     private ArrayList<Obstacle> obstacles = new ArrayList<>();
     private int obstacleSpeed = 10;
 
@@ -37,7 +35,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
         //this.context = context;
         groundY = getHeight() - 100;
-        characterY = groundY - characterSize;
+        characterY = groundY - characterHeight;
     }
 
     @Override
@@ -62,7 +60,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         groundY = getHeight() - 100;
-        characterY = groundY - characterSize;
+        characterY = groundY - characterHeight;
 
         thread.setRunning(true);
         thread.start();
@@ -83,7 +81,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         canvas.drawRect(0, getHeight() - 100, getWidth(), getHeight(), paint);
 
         paint.setColor(Color.RED);
-        canvas.drawRect(characterX, characterY, characterX + characterSize, characterY + characterSize, paint);
+        canvas.drawRect(characterX, characterY, characterX + characterWidth, characterY + characterHeight, paint);
 
         paint.setColor(Color.BLACK);
         for (Obstacle obstacle : obstacles) {
@@ -104,8 +102,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (isJumping) {
                 characterY += jumpVelocity;
                 jumpVelocity += gravity;
-                if (characterY >= groundY - characterSize) {
-                    characterY = groundY - characterSize;
+                if (characterY >= groundY - characterHeight) {
+                    characterY = groundY - characterHeight;
                     isJumping = false;
                 }
             }
@@ -115,8 +113,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 Obstacle obstacle = iterator.next();
                 obstacle.x -= obstacleSpeed;
 
-                if (characterX + characterSize > obstacle.x && characterX < obstacle.x +
-                obstacle.size && characterY + characterSize > groundY - obstacle.size) {
+                if (characterX + characterWidth > obstacle.x && characterX < obstacle.x +
+                obstacle.size && characterY + characterHeight > groundY - obstacle.size) {
                     gameOver = true;
                     thread.setRunning(false);
                 }
