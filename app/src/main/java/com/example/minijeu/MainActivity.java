@@ -15,9 +15,12 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends Activity {
 
+    private static Context gameContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        gameContext = this;
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -29,5 +32,9 @@ public class MainActivity extends Activity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt("valeur_y", valeur_y);
         editor.apply();
+    }
+
+    public static Context getGameContext() {
+        return gameContext;
     }
 }

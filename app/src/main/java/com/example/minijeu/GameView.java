@@ -1,12 +1,16 @@
 package com.example.minijeu;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.example.minijeu.entities.GameCharacters;
+
 import java.util.Iterator;
 
 import java.util.ArrayList;
@@ -20,12 +24,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private float gravity = 2;
     private int groundY = 400;
     private int jumpHeight = 150;
-    private int characterWidth = 50;
-    private int characterHeight = 100;
+    private int characterWidth = 70;
+    private int characterHeight = 150;
     private int characterX = 0;
     private int characterY = 0;
     private ArrayList<Obstacle> obstacles = new ArrayList<>();
     private int obstacleSpeed = 10;
+    private static final int MIN_DISTANCE_BETWEEN_OBSTACLES = 200;
 
 
     public GameView(Context context) {
@@ -70,6 +75,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
+
         if (canvas == null) return;
 
         Paint paint = new Paint();
@@ -85,8 +91,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
         paint.setColor(Color.BLACK);
         for (Obstacle obstacle : obstacles) {
-            canvas.drawRect(obstacle.x, groundY - obstacle.size, obstacle.x + obstacle.size, groundY, paint);
-
+            //canvas.drawRect(obstacle.x, groundY - obstacle.size, obstacle.x + obstacle.size, groundY, paint);
+            //canvas.drawBitmap(GameCharacters.GHOST.getSprite(0,0), 200, 200, null);
+            canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
         }
 
         if (gameOver) {
@@ -125,7 +132,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
 
             if (Math.random() < 0.02) {
-                obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
+                //obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
+                generateObstacle();
             }
         }
     }
@@ -134,7 +142,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN && !isJumping) {
             isJumping = true;
-            jumpVelocity = -20;
+            jumpVelocity = -30;
         }
         return super.onTouchEvent(event);
     }
@@ -146,6 +154,18 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Obstacle(int x, int size) {
             this.x = x;
             this.size = size;
+        }
+    }
+
+    private void generateObstacle() {
+        if (obstacles.isEmpty()) {
+            obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
+        } else {
+            Obstacle lastObstacle = obstacles.get(obstacles.size() -1);
+
+            if (lastObstacle.x < getWidth() - MIN_DISTANCE_BETWEEN_OBSTACLES) {
+                obstacles.add(new Obstacle(getWidth(), (int) (Math.random() * 50) + 50));
+            }
         }
     }
 }
