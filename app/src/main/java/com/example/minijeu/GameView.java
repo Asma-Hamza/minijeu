@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.minijeu.entities.GameCharacters;
+
 import java.util.Iterator;
 
 import java.util.ArrayList;
@@ -118,8 +120,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Bitmap axe = Bitmap.createScaledBitmap(spriteSheet, spriteSheet.getWidth() * 3, spriteSheet.getHeight() * 3,false);
 
         for (Obstacle obstacle : obstacles) {
-            //canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
-            canvas.drawBitmap(axe, obstacle.x, groundY - obstacle.size, null);
+            canvas.drawBitmap(GameCharacters.GHOST.getSprite(0, 0), obstacle.x, groundY - obstacle.size, null);
+            //canvas.drawBitmap(axe, obstacle.x, groundY - obstacle.size, null);
         }
 
 
